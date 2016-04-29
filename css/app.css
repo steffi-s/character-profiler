@@ -1,0 +1,11 @@
+body {
+    padding-top: 70px;
+}
+
+.characterName, .traitLookup, .loadCharacter {
+    cursor: pointer;
+}
+
+#characterForm {
+    display: none;
+}
