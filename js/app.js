@@ -41,7 +41,7 @@ $(document).ready(function () {
   var $characterForm = $("#characterForm");
   var $characterList = $("#characterList");
 
-  var openRequest = window.indexedDB.open(dbName, 1);
+  var openRequest = window.indexedDB.open(dbName, 3);
 
   openRequest.onerror = function (e) {
     console.log("Error opening db");
@@ -62,6 +62,16 @@ $(document).ready(function () {
 
       objectStore.createIndex("namelc", "namelc", {unique: false});
       objectStore.createIndex("traits", "traits", {
+        unique: false,
+        multiEntry: true
+      });
+
+    } else {
+      //thisDb.close();
+      objectStore = e.currentTarget.transaction.objectStore(storeName);
+
+
+      objectStore.createIndex("familyMembers", "familyMembers", {
         unique: false,
         multiEntry: true
       });
@@ -154,8 +164,20 @@ $(document).ready(function () {
 
       $("#key").val(character.id);
       $("#name").val(character.name);
-      $("#body").val(character.body);
+      $("#nickname").val(character.nickname);
+      $("#description").val(character.description);
+      $("#age").val(character.age);
+      $("#hairColor").val(character.hairColor);
+      $("#eyeColor").val(character.eyeColor);
+      $("#skinTone").val(character.skinTone);
+      $("#race").val(character.race);
+      $("#ethnicGroup").val(character.ethnicGroup);
+      $("#citizenship").val(character.citizenship);
+      $("#role").val(character.role);
+      $("#marks").val(character.marks);
+      $("#familyMembers").val(character.familyMembers.join(","));
       $("#traits").val(character.traits.join(","));
+
       $characterDetail.hide();
       $characterForm.show();
     };
@@ -166,17 +188,41 @@ $(document).ready(function () {
   $characterList.on("click", "td", function () {
     var thisId = $(this).parent().data("key");
 
-    displayNote(thisId);
+    displayCharacter(thisId);
   });
 
-  function displayNote(id) {
+  function displayCharacter(id) {
     var transaction = db.transaction([storeName]);
     var objectStore = transaction.objectStore(storeName);
     var request = objectStore.get(id);
 
     request.onsuccess = function (event) {
       var character = request.result;
+
       var content = "<h2>" + character.name + "</h2>";
+      content += "<p><strong>Nickname:</strong> " + character.nickname + "</p>";
+      content += "<p><strong>Description:</strong> " + character.description + "</p>";
+      content += "<p><strong>Age:</strong> " + character.age + "</p>";
+      content += "<p><strong>Hair Color:</strong> " + character.hairColor + "</p>";
+      content += "<p><strong>Eye Color:</strong> " + character.eyeColor + "</p>";
+      content += "<p><strong>Skin Tone:</strong> " + character.skinTone + "</p>";
+      content += "<p><strong>Race:</strong> " + character.race + "</p>";
+      content += "<p><strong>Ethnic Group:</strong> " + character.ethnicGroup + "</p>";
+      content += "<p><strong>Citizenship:</strong> " + character.citizenship + "</p>";
+      content += "<p><strong>Role in the Story:</strong> " + character.role + "</p>";
+      content += "<p><strong>Notable Marks:</strong> " + character.marks + "</p>";
+
+      // console.log(character.familyMembers);
+      // console.log(character.traits);
+
+      if (character.familyMembers.length > 0) {
+        content += "<strong>Family Members:</strong> ";
+        character.familyMembers.forEach(function (elm, idx, arr) {
+          content += "<a class='familyLookup' title='Click for family members' data-characterid=" + character.id + ">" + elm + "</a>";
+        });
+
+        content += "<br/><div id='relatedCharactersDisplay'></div>";
+      }
 
       if (character.traits.length > 0) {
         content += "<strong>Traits:</strong> ";
@@ -187,8 +233,6 @@ $(document).ready(function () {
         content += "<br/><div id='relatedCharactersDisplay'></div>";
       }
 
-      content += "<p>" + character.body + "</p>";
-
       $characterDetail.html(content).show();
       $characterForm.hide();
     };
@@ -196,8 +240,19 @@ $(document).ready(function () {
 
   $("#addCharacterButton").on("click", function (e) {
     $("#name").val("");
-    $("#body").val("");
+    $("#nickname").val("");
+    $("#description").val("");
+    $("#age").val("");
+    $("#hairColor").val("");
+    $("#eyeColor").val("");
+    $("#skinTone").val("");
+    $("#race").val("");
+    $("#ethnicGroup").val("");
+    $("#citizenship").val("");
+    $("#role").val("");
+    $("#marks").val("");
     $("#key").val("");
+    $("#familyMembers").val("");
     $("#traits").val("");
 
     $characterDetail.hide();
@@ -206,9 +261,26 @@ $(document).ready(function () {
 
   $("#saveCharacterButton").on("click", function () {
     var name = $("#name").val();
-    var body = $("#body").val();
+    var nickname = $("#nickname").val();
+    var description = $("#description").val();
+    var age = $("#age").val();
+    var hairColor = $("#hairColor").val();
+    var eyeColor = $("#eyeColor").val();
+    var skinTone = $("#skinTone").val();
+    var race = $("#race").val();
+    var ethnicGroup = $("#ethnicGroup").val();
+    var citizenship = $("#citizenship").val();
+    var role = $("#role").val();
+    var marks = $("#marks").val();
     var key = $("#key").val();
     var namelc = name.toLowerCase();
+
+    // handle family members
+    var familyMembers = [];
+    var familyString = $("#familyMembers").val();
+    if (familyString.length) {
+      familyMembers = familyString.split(",");
+    }
 
     // handle traits
     var traits = [];
@@ -222,18 +294,40 @@ $(document).ready(function () {
     if (key === "") {
       t.objectStore(storeName).add({
         name: name,
-        body: body,
+        nickname: nickname,
+        description: description,
+        age: age,
+        hairColor: hairColor,
+        eyeColor: eyeColor,
+        skinTone: skinTone,
+        race: race,
+        ethnicGroup: ethnicGroup,
+        citizenship: citizenship,
+        role: role,
+        marks: marks,
         updated: new Date(),
         namelc: namelc,
+        familyMembers: familyMembers,
         traits: traits
       });
     } else {
       t.objectStore(storeName).put({
         name: name,
-        body: body,
+        nickname: nickname,
+        description: description,
+        age: age,
+        hairColor: hairColor,
+        eyeColor: eyeColor,
+        skinTone: skinTone,
+        race: race,
+        ethnicGroup: ethnicGroup,
+        citizenship: citizenship,
+        role: role,
+        marks: marks,
         updated: new Date(),
         id: Number(key),
         namelc: namelc,
+        familyMembers: familyMembers,
         traits: traits
       });
     }
@@ -241,7 +335,18 @@ $(document).ready(function () {
     t.oncomplete = function (event) {
       $("#key").val("");
       $("#name").val("");
-      $("#body").val("");
+      $("#nickname").val("");
+      $("#description").val("");
+      $("#age").val("");
+      $("#hairColor").val("");
+      $("#eyeColor").val("");
+      $("#skinTone").val("");
+      $("#race").val("");
+      $("#ethnicGroup").val("");
+      $("#citizenship").val("");
+      $("#role").val("");
+      $("#marks").val("");
+      $("#familyMembers").val("");
       $("#traits").val("");
 
       displayCharacters();
@@ -258,25 +363,105 @@ $(document).ready(function () {
     displayCharacters(filter);
   });
 
-  $(document).on("click", ".tagLookup", function (e) {
-    var trait = e.target.text;
-    var parentCharacter = $(this).data("characterid");
+  // $(document).on("click", ".familyLookup", function (e) {
+  //   var familyMember = e.target.text;
+  //   var parentCharacter = $(this).data("characterid");
+  //   var doneone = false;
+  //   var content = "<strong>Family Members:</strong><br/>";
+  //
+  //   var transaction = db.transaction([storeName], "readonly");
+  //   var objectStore = transaction.objectStore(storeName);
+  //   var familyIndex = objectStore.index("familyMembers");
+  //   var range = IDBKeyRange.only(familyMember);
+  //
+  //   transaction.oncomplete = function (event) {
+  //     if (!doneone) {
+  //       content += "No family member(s) found.";
+  //     }
+  //
+  //     content += "<p/>";
+  //
+  //     $("#relatedNotesDisplay").html(content);
+  //   };
+  //
+  //   var handleResult = function (event) {
+  //     var cursor = event.target.result;
+  //     if (cursor) {
+  //       if (cursor.value.id != parentCharacter) {
+  //         doneone = true;
+  //         content += "<a class='loadCharacter' data-characterid=" + cursor.value.id + ">" + cursor.value.name + "</a><br/>";
+  //       }
+  //
+  //       cursor.continue();
+  //     }
+  //   };
+  //
+  //   familyIndex.openCursor(range).onsuccess = handleResult;
+  // });
+
+  handleArray();
+
+  // $(document).on("click", ".traitLookup", function (e) {
+  //   var trait = e.target.text;
+  //   var parentCharacter = $(this).data("characterid");
+  //   var doneOne = false;
+  //   var content = "<strong>Related Characters:</strong><br/>";
+  //
+  //   var transaction = db.transaction([storeName], "readonly");
+  //   var objectStore = transaction.objectStore(storeName);
+  //   var traitIndex = objectStore.index("traits");
+  //   var range = IDBKeyRange.only(trait);
+  //
+  //   transaction.oncomplete = function (event) {
+  //     if (!doneOne) {
+  //       content += "No other characters have this trait.";
+  //     }
+  //
+  //     content += "<p/>";
+  //
+  //     $("#relatedCharactersDisplay").html(content);
+  //   };
+  //
+  //   var handleResult = function (event) {
+  //     var cursor = event.target.result;
+  //     if (cursor) {
+  //       if (cursor.value.id != parentCharacter) {
+  //         doneOne = true;
+  //         content += "<a class='loadCharacter' data-characterid=" + cursor.value.id + ">" + cursor.value.name + "</a><br/>";
+  //       }
+  //
+  //       cursor.continue();
+  //     }
+  //   };
+  //
+  //   traitIndex.openCursor(range).onsuccess = handleResult;
+  // });
+  
+  $(document).on("click", ".loadCharacter", function (e) {
+    var characterId = $(this).data("characterid");
+    displayCharacter(characterId);
+  });
+});
+
+function handleArray() {
+  $(document).on("click", ".familyLookup", function (e) {
+    var familyMember = e.target.text;
     var doneOne = false;
-    var content = "<strong>Related Characters:</strong><br/>";
+    var parentCharacter = $(this).data("characterid");
+    var content = "<strong>Family Members:</strong><br/>";
 
     var transaction = db.transaction([storeName], "readonly");
     var objectStore = transaction.objectStore(storeName);
-    var traitIndex = objectStore.index("traits");
-    var range = IDBKeyRange.only(trait);
-
+    var familyIndex = objectStore.index("familyMembers");
+    var range = IDBKeyRange.only(familyMember);
     transaction.oncomplete = function (event) {
       if (!doneOne) {
-        content += "No other characters have this trait.";
+        content += "No family member(s) found.";
       }
 
       content += "<p/>";
 
-      $("#relatedNotesDisplay").html(content);
+      $("#relatedCharactersDisplay").html(content);
     };
 
     var handleResult = function (event) {
@@ -290,12 +475,42 @@ $(document).ready(function () {
         cursor.continue();
       }
     };
-    
+
+    familyIndex.openCursor(range).onsuccess = handleResult;
+  });
+
+  $(document).on("click", ".traitLookup", function (e) {
+    var trait = e.target.text;
+    var doneOne = false;
+    var parentCharacter = $(this).data("characterid");
+    var content = "<strong>Related Characters:</strong><br/>";
+
+    var transaction = db.transaction([storeName], "readonly");
+    var objectStore = transaction.objectStore(storeName);
+    var traitIndex = objectStore.index("traits");
+    var range = IDBKeyRange.only(trait);
+    transaction.oncomplete = function (event) {
+      if (!doneOne) {
+        content += "No other characters have this trait.";
+      }
+
+      content += "<p/>";
+
+      $("#relatedCharactersDisplay").html(content);
+    };
+
+    var handleResult = function (event) {
+      var cursor = event.target.result;
+      if (cursor) {
+        if (cursor.value.id != parentCharacter) {
+          doneOne = true;
+          content += "<a class='loadCharacter' data-characterid=" + cursor.value.id + ">" + cursor.value.name + "</a><br/>";
+        }
+
+        cursor.continue();
+      }
+    };
+
     traitIndex.openCursor(range).onsuccess = handleResult;
   });
-  
-  $(document).on("click", ".loadCharacter", function (e) {
-    var characterId = $(this).data("characterid");
-    displayNote(characterId);
-  });
-});
+}
