@@ -6,6 +6,11 @@ var db;
 var dbName = "character_db";
 var storeName = "character";
 
+/**
+ * build the format for date and time
+ * @param input
+ * @returns {*}
+ */
 function dtFormat(input) {
   if (!input) return "";
 
@@ -31,6 +36,9 @@ function dtFormat(input) {
   return res;
 }
 
+/**
+ *
+ */
 $(document).ready(function () {
   if (!("indexedDB" in window)) {
     alert("IndexedDB support required for this demo!");
@@ -89,6 +97,11 @@ $(document).ready(function () {
     doCount();
   };
 
+  /**
+   * display filtered characters
+   * @param filter Filter for specific characters
+   * @return {void}
+   */
   function displayCharacters(filter) {
     var transaction = db.transaction([storeName], "readonly");
     var content = "<table class='table table-bordered table-striped'>" +
@@ -105,6 +118,10 @@ $(document).ready(function () {
       $characterList.html(content);
     };
 
+    /**
+     *
+     * @param event
+     */
     var handleResult = function (event) {
       var cursor = event.target.result;
       if (cursor) {
@@ -132,6 +149,10 @@ $(document).ready(function () {
     }
   }
 
+  /**
+   * count characters in the database
+   * @return {void}
+   */
   function doCount() {
     db.transaction([storeName], "readonly").objectStore(storeName).count().onsuccess = function (event) {
       $("#sizeSpan").text("(" + event.target.result + " Characters Total)");
@@ -191,7 +212,12 @@ $(document).ready(function () {
     displayCharacter(thisId);
   });
 
-  function displayCharacter(id) {
+  /**
+   * display a specific character
+   * @param id Id of the caracter to display
+   * @return {void}
+   */
+   displayCharacter = function (id) {
     var transaction = db.transaction([storeName]);
     var objectStore = transaction.objectStore(storeName);
     var request = objectStore.get(id);
@@ -236,7 +262,7 @@ $(document).ready(function () {
       $characterDetail.html(content).show();
       $characterForm.hide();
     };
-  }
+  };
 
   $("#addCharacterButton").on("click", function (e) {
     $("#name").val("");
@@ -443,6 +469,10 @@ $(document).ready(function () {
   });
 });
 
+/**
+ * handles comma separated values of input text fields
+ * @return {void}
+ */
 function handleArray() {
   $(document).on("click", ".familyLookup", function (e) {
     var familyMember = e.target.text;
@@ -464,12 +494,17 @@ function handleArray() {
       $("#relatedCharactersDisplay").html(content);
     };
 
+    /**
+     * handles result for a cursor
+     * @param event
+     * @return {void}
+     */
     var handleResult = function (event) {
       var cursor = event.target.result;
       if (cursor) {
         if (cursor.value.id != parentCharacter) {
           doneOne = true;
-          content += "<a class='loadCharacter' data-characterid=" + cursor.value.id + ">" + cursor.value.name + "</a><br/>";
+          content += "<a onclick='displayCharacter(" + cursor.value.id + ");' class='loadCharacter' data-characterid=" + cursor.value.id + ">" + cursor.value.name + "</a><br/>";
         }
 
         cursor.continue();
@@ -499,6 +534,11 @@ function handleArray() {
       $("#relatedCharactersDisplay").html(content);
     };
 
+    /**
+     * handles result for a cursor
+     * @param event
+     * @return {void}
+     */
     var handleResult = function (event) {
       var cursor = event.target.result;
       if (cursor) {

@@ -12,3 +12,6 @@ It should be self explanatory but feel free to comment.
 This tool is not a tool to create and manage a whole project. It's just a character editing tool.
 
 Credit:
+
+## Installation and Usage
+No installation required. To use this tool simply open the index.html file in your browser, and start adding characters.
