@@ -1,5 +1,5 @@
 # README
-The CharacterProfilingTool lets you define profiles for your story or movie characters. The tool makes use of IndexedDB, and therefore data is stored in your browser not on a web server.
+This simple character profiling tool lets you define profiles for your story or movie characters. The tool makes use of IndexedDB, and therefore data is stored in your browser not on a web server.
 
 You can add, delete and edit your characters any time.
 
@@ -11,7 +11,5 @@ It should be self explanatory but feel free to comment.
 
 This tool is not a tool to create and manage a whole project. It's just a character editing tool.
 
-Credit:
-
 ## Installation and Usage
-No installation required. To use this tool simply open the index.html file in your browser, and start adding characters.
+No installation required. To use this tool simply download the files, and open the index.html file in your browser, and start adding characters.
