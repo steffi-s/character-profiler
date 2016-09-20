@@ -1,4 +1,6 @@
 # README
+This project is a proof of concept (POC), and should proof that IndexedDB is a viable storage solution for such a project. But it is not.
+
 This simple character profiling tool lets you define profiles for your story or movie characters. The tool makes use of IndexedDB, and therefore data is stored in your browser not on a web server.
 
 You can add, delete and edit your characters any time.
